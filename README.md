@@ -1,4 +1,5 @@
-# Nu primesc notă pentru că nu am pus titlu și descriere
+# Minesweeper
+Minesweeper este un joc video clasic, de logică, singleplayer, care se desfășoară pe o tablă dreptunghiulară. Scopul este să se găsească un număr prestabilit de „mine” plasate aleatoriu în cel mai scurt timp posibil, făcând clic pe celulele „sigure” și evitând celulele cu mine.
 
 ### Important!
 Aveți voie cu cod generat de modele de limbaj la care nu ați contribuit semnificativ doar în folder-ul `generated`.
