@@ -1,9 +1,6 @@
-# Nu primesc notă pentru că nu am pus titlu și descriere
+# Minesweeper Power-Ups
 
-### Important!
-Aveți voie cu cod generat de modele de limbaj la care nu ați contribuit semnificativ doar în folder-ul `generated`.
-Codul generat pus "ca să fie"/pe care nu îl înțelegeți se punctează doar pentru puncte bonus, doar în contextul
-în care oferă funcționalități ajutătoare și doar dacă are sens.
+Minesweeper este un joc video clasic, de logică, singleplayer, care se desfășoară pe o tablă dreptunghiulară. Scopul este să se găsească un număr prestabilit de „mine” plasate aleatoriu în cel mai scurt timp posibil (folosind și power-ups ca ajutor), făcând clic pe celulele „sigure” și evitând celulele cu mine. 
 
 O cerință nu se consideră îndeplinită dacă este realizată doar ca o serie de apeluri proxy către cod generat.
 
