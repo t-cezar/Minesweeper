@@ -54,6 +54,10 @@ add_executable(${PROJECT_NAME}
     main.cpp
     generated/src/Helper.cpp
     env_fixes.h
+        src/Cell.cpp
+        headers/Cell.h
+        headers/Grid.h
+        src/Grid.cpp
 )
 
 include(cmake/CompilerFlags.cmake)
