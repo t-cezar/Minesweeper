@@ -3,8 +3,8 @@
 #include "./headers/Cell.h"
 
 int main() {
-    int gridSize = 5;
-    int nrMines = 8;
+    int gridSize = 9;
+    int nrMines = 5;
 
     Grid gameGrid(gridSize, nrMines);
     gameGrid.generateGame();
@@ -19,15 +19,11 @@ int main() {
     }
     std::cout << "\n";
 
-    //testing reveal
-    int testX = 2, testY = 2;
+    //testez reveal & flag pt (2,2) si (3,3)
+    int testX = 5, testY = 5;
     gameGrid.revealCell(testX, testY);
-    const Cell& revealedCell = gameGrid.getCell(testX, testY);
-    std::cout << "Cell (" << testX << ", " << testY << ") "
-              << (revealedCell.isRevealed() ? "is revealed." : "is still hidden.") << "\n";
+    gameGrid.flagCell(testX+1, testY+1);
 
-
-    // Check each cell's status for additional testing
     std::cout << "\nDetalii pt fiecare celula:\n";
     for (int row = 0; row < gridSize; ++row) {
         for (int col = 0; col < gridSize; ++col) {

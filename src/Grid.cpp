@@ -9,11 +9,11 @@ void Grid::generateMines(std::mt19937& seed){
 
     while (mineCount < nrMines) {
         int randomPos = distrib(seed);
-        int x = randomPos / gridSize;
-        int y = randomPos % gridSize;
+        int row = randomPos / gridSize;
+        int col = randomPos % gridSize;
 
-        if (!grid[x][y].isMine()) {
-            grid[x][y].setMine();
+        if (!grid[row][col].isMine()) {
+            grid[row][col].setMine();
             mineCount++;
         }
     }
@@ -29,9 +29,15 @@ const Cell& Grid::getCell(const int& row, const int& col) const{
     return grid[row][col];
 }
 
-void Grid::revealCell(int x, int y) {
-    if (x >= 0 && x < gridSize && y >= 0 && y < gridSize) {
-        grid[x][y].revealCell();
+void Grid::flagCell(int row, int col) {
+    if (row >= 0 && row < gridSize && col >= 0 && col < gridSize) {
+        grid[row][col].flagCell();
+    }
+}
+
+void Grid::revealCell(int row, int col) {
+    if (row >= 0 && row < gridSize && col >= 0 && col < gridSize) {
+        grid[row][col].revealCell();
     }
 }
 

@@ -21,6 +21,7 @@ public:
     Grid(int size, int mines);
 
     [[nodiscard]]const Cell& getCell(const int& row, const int& col) const;
+    void flagCell(int row, int col);
     void revealCell(int row, int col);
     void generateGame();
 
