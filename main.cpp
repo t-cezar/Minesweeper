@@ -4,7 +4,7 @@
 
 int main() {
     int gridSize = 9;
-    int nrMines = 5;
+    int nrMines = 4;
 
     Grid gameGrid(gridSize, nrMines);
     gameGrid.generateGame();
