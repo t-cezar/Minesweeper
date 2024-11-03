@@ -1,7 +1,3 @@
-//
-// Created by cezar on 02/11/2024.
-//
-
 #ifndef GRID_H
 #define GRID_H
 

@@ -1,7 +1,3 @@
-//
-// Created by cezar on 02/11/2024.
-//
-
 #include "../headers/Cell.h"
 
 Cell::Cell():
