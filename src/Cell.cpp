@@ -14,23 +14,23 @@ void Cell::revealCell() {
 void Cell::flagCell() {
     flagged = true;
 }
-bool Cell::isMine() const{
+bool Cell::isMine() const {
     return mine;
 }
 bool Cell::isRevealed() const {
     return revealed;
 }
-bool Cell::isFlagged() const{
+bool Cell::isFlagged() const {
     return flagged;
 }
 
 std::ostream& operator<<(std::ostream& stream, const Cell& cell) {
     if (cell.isFlagged()) {
         stream << "F";
-    } else if (cell.isMine()) {
-        stream << "x";
     } else if (cell.isRevealed()) {
         stream << "R";
+    } else if (cell.isMine()) {
+        stream << "x";
     } else {
         stream << "o";
     }

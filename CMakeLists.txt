@@ -58,6 +58,10 @@ add_executable(${PROJECT_NAME}
         headers/Cell.h
         headers/Grid.h
         src/Grid.cpp
+        headers/Game.h
+        src/Game.cpp
+        headers/GameTexture.h
+        src/GameTexture.cpp
 )
 
 include(cmake/CompilerFlags.cmake)

@@ -1,17 +1,22 @@
 #include <iostream>
+#include "./headers/Game.h"
 #include "./headers/Grid.h"
 #include "./headers/Cell.h"
+//#include <thread>
 
 int main() {
-    int gridSize = 9;
-    int nrMines = 4;
+    Game game(15,15,40);
+    game.run();
 
-    Grid gameGrid(gridSize, nrMines);
-    gameGrid.generateGame();
+    int rows = 15;
+    int cols = 15;
+    int nrMines = 40;
 
+    Grid gameGrid(rows, cols, nrMines);
+    gameGrid.generateMines();
     std::cout << "Bombele din grid (x = bomba, o = safe):\n";
-    for (int row = 0; row < gridSize; ++row) {
-        for (int col = 0; col < gridSize; ++col) {
+    for (int row = 0; row < rows; row++) {
+        for (int col = 0; col < cols; col++) {
             const Cell& cell = gameGrid.getCell(row, col);
             std::cout << (cell.isMine() ? "x " : "o ");
         }
@@ -25,8 +30,8 @@ int main() {
     gameGrid.flagCell(testX+1, testY+1);
 
     std::cout << "\nDetalii pt fiecare celula:\n";
-    for (int row = 0; row < gridSize; ++row) {
-        for (int col = 0; col < gridSize; ++col) {
+    for (int row = 0; row < rows; row++) {
+        for (int col = 0; col < cols; col++) {
             const Cell& cell = gameGrid.getCell(row, col);
             std::cout << "Cell (" << row << ", " << col << "): "
                       << (cell.isMine() ? "Mine" : "No mine") << ", "
@@ -37,5 +42,8 @@ int main() {
 
     std::cout<<std::endl;
     std::cout<<gameGrid;
+/*
+
+ */
     return 0;
 }

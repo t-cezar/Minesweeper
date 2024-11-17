@@ -1,16 +1,17 @@
 #include "../headers/Grid.h"
-#include <random>
 
-Grid::Grid(int size, int mines) : gridSize(size), nrMines(mines), grid(size, std::vector<Cell>(size)) {}
+Grid::Grid(int rows, int cols, int mines)
+    :rows(rows),
+     cols(cols),
+     nrMines(mines),
+     grid(rows, std::vector<Cell>(cols)) {}
 
-void Grid::generateMines(std::mt19937& seed){
+void Grid::generateMines() {
     int mineCount = 0;
-    std::uniform_int_distribution<int> distrib(0, gridSize * gridSize - 1);
-
     while (mineCount < nrMines) {
-        int randomPos = distrib(seed);
-        int row = randomPos / gridSize;
-        int col = randomPos % gridSize;
+        int randomPos = randomNr(0, rows * cols - 1);
+        int row = randomPos / cols;
+        int col = randomPos % cols;
 
         if (!grid[row][col].isMine()) {
             grid[row][col].setMine();
@@ -19,34 +20,38 @@ void Grid::generateMines(std::mt19937& seed){
     }
 }
 
-void Grid::generateGame() {
-    std::random_device rd;
-    std::mt19937 gen(rd());
-    generateMines(gen);
-}
-
 const Cell& Grid::getCell(const int& row, const int& col) const{
     return grid[row][col];
 }
 
-void Grid::flagCell(int row, int col) {
-    if (row >= 0 && row < gridSize && col >= 0 && col < gridSize) {
-        grid[row][col].flagCell();
+void Grid::withinGrid(int row, int col, void (Cell::*fCell)()) {
+    if (row >= 0 && row < rows && col >= 0 && col < cols) {
+        (grid[row][col].*fCell)();
     }
+}
+
+void Grid::flagCell(int row, int col) {
+    withinGrid(row, col, &Cell::flagCell);
 }
 
 void Grid::revealCell(int row, int col) {
-    if (row >= 0 && row < gridSize && col >= 0 && col < gridSize) {
-        grid[row][col].revealCell();
-    }
+    withinGrid(row, col, &Cell::revealCell);
 }
 
-std::ostream& operator<<(std::ostream& stream, const Grid& gameGrid) {
-    for (int row = 0; row < gameGrid.gridSize; row++) {
-        for (int col = 0; col < gameGrid.gridSize; col++) {
-            stream << gameGrid.grid[row][col] << " ";
+int Grid::randomNr(int low, int high) {
+    static std::random_device rd;
+    static std::default_random_engine gen(rd());
+    using Dist = std::uniform_int_distribution<int>;
+    static Dist uid {};
+    return uid(gen, Dist::param_type{low, high});
+}
+
+std::ostream& operator<<(std::ostream& os, const Grid& grid) {
+    for (int row = 0; row < grid.rows; row++) {
+        for (int col = 0; col < grid.cols; col++) {
+            os << grid.grid[row][col] << " ";
         }
-        stream << "\n";
+        os << "\n";
     }
-    return stream;
+    return os;
 }
