@@ -5,6 +5,7 @@ Game::Game(int rows, int cols, int mines)
       cols(cols),
       nrMines(mines),
       grid(rows, cols, mines),
+      textureMap(std::make_shared<std::map<std::string, sf::Texture>>()),
       gameTexture(textureMap),
       shouldExit(false) {}
 
@@ -15,8 +16,9 @@ void Game::initAddTextures() {
     gameTexture.addTexture("cornerBottomRight", "assets/corner_bottom_right.png");
     gameTexture.addTexture("t1", "assets/t_left.png");
     gameTexture.addTexture("t2", "assets/t_right.png");
-
-    GameTexture::populateCells(cells, "assets/textures.png");
+    gameTexture.addTexture("sprite sheet", "assets/textures.png");
+    //todo: iau pe rand stringurile dintr-un fisier text si fac un for pt addTextures
+    GameTexture::addCellsTextures(cells);
 }
 void Game::createWindow() {
     window.create(sf::VideoMode({800, 1000}), "Minesweeper Power-Ups", sf::Style::Default);
@@ -28,7 +30,6 @@ void Game::run() {
 
     while (window.isOpen()) {
         update();
-
         render();
 
         using namespace std::chrono_literals;
@@ -64,45 +65,20 @@ void Game::update() {
 }
 
 void Game::render() {
-
     window.clear(sf::Color(80, 80, 80));
+
+    initAddTextures();
+    //testing sa vad daca afiseaza corect in window
+    sf::Sprite sprite1;
+    sprite1.setTexture((*textureMap)["cornerTopLeft"]);
+    sprite1.setPosition(10.f, 10.f);
+    window.draw(sprite1);
+
+    sf::Sprite sprite2;
+    sprite2.setTexture((*textureMap)["sprite sheet"]);
+    sprite2.setTextureRect(cells[4]);
+    sprite2.setPosition(40.f, 40.f);
+    window.draw(sprite2);
+
     window.display();
 }
-// //am incercat mai jos sa testez daca afiseaza doua texturi, una
-// //din map si una din cell, dar nu apare nimic. Nu imi dau seama daca
-// //problema este ca am ales sa scriu in render(), sau ceva
-// //este incorect in clasa Game sau GameTexture
-// //nu sunt sigur nici daca este corecta structura
-// //cu update() si render()
-
-// void Game::render() {
-//     //window.clear(sf::Color(80, 80, 80));
-//
-//
-//     sf::Sprite sprite;
-//     sprite.setTexture((*textureMap)["t1"]);
-//
-//     sprite.setTextureRect(cells[0]);
-//
-//     sprite.setPosition(100.f, 100.f);
-//
-//     window.draw(sprite);
-//
-//
-//     window.display();
-// }
-
-
-
-
-
-// //faptul ca nu afisa nimic m-a facut sa comentez tot codul care afisa
-// //in consola testele din main. Ca sa ma ocup strict de window.
-// //Am observat ca nu aparea deloc window atunci cand
-// //comentam tot acel cod mai putin instantierea obiectului Game
-// //si apelarea functiei run().
-
-// //Window aparea doar atunci cand aveam /* pus la inceputul liniei 29 (sau oriunde dupa)
-// //Am incercat sa folosesc si sleep poate are
-// //nevoie de mai mult timp, dar nu a functionat, sau poate nu am pus
-// //destul

@@ -12,11 +12,12 @@ class Game {
     int cols;
     int nrMines;
     Grid grid;
+
+    std::shared_ptr<std::map<std::string, sf::Texture>> textureMap = std::make_shared<std::map<std::string, sf::Texture>>();
     GameTexture gameTexture;
 
     sf::RenderWindow window;
     sf::IntRect cells[12];
-    std::shared_ptr<std::map<std::string, sf::Texture>> textureMap = std::make_shared<std::map<std::string, sf::Texture>>();
     bool shouldExit;
     void initAddTextures();
 

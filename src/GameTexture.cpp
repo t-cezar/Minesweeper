@@ -13,12 +13,7 @@ void GameTexture::addTexture(const std::string &name, const std::string &path) c
     }
 }
 
-void GameTexture::populateCells(sf::IntRect (&cells)[12], const std::string& texturePath) {
-    sf::Texture texture;
-    if (!texture.loadFromFile(texturePath)) {
-        throw std::runtime_error("Error2");
-    }
-
+void GameTexture::addCellsTextures(sf::IntRect (&cells)[12]) {
     cells[0] = sf::IntRect(1, 73, 16, 16);
     for (int i = 1; i <= 7; i++) {
         cells[i] = cells[i - 1];

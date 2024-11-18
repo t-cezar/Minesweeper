@@ -16,7 +16,7 @@ public:
     void addTexture(const std::string &name, const std::string &path) const;
 
     //"Populeaza" array-ul cells[12] dintr-un sprite sheet cu texturile specifice
-    static void populateCells(sf::IntRect (&cells)[12], const std::string &texturePath);
+    static void addCellsTextures(sf::IntRect (&cells)[12]);
 };
 
 #endif // GAMETEXTURE_H
