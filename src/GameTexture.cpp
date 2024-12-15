@@ -1,5 +1,5 @@
 #include "../headers/GameTexture.h"
-#include <stdexcept>//todo: sa-l inlocuiesc cu functii, i.e. loadError()
+#include <stdexcept>
 
 GameTexture::GameTexture(std::shared_ptr<std::map<std::string, sf::Texture>> textureMap)
     : textureMap(std::move(textureMap)) {}
