@@ -19,7 +19,7 @@ class Game {
     sf::View gridView;
     sf::RenderTexture staticLayer;
     sf::Sprite staticLayerSprite;
-    sf::IntRect cells[12];
+    sf::IntRect cells[13];
     bool shouldExit;
     bool gameOver;
 
@@ -31,14 +31,14 @@ class Game {
     void testingGen() const;
     static void drawSprite(sf::RenderTarget& target,
                         const sf::Texture& texture, float x, float y);
-    static void drawSprite(sf::RenderTarget& target,
-                        const sf::Texture& texture, float x, float y, const sf::IntRect& rect);
+    static void drawSprite(sf::RenderTarget& target, const sf::Texture& texture,
+                        float x, float y, const sf::IntRect& rect, bool red);
     static void drawVert(sf::RenderTarget& target, const sf::Texture& texture,
                         int cnt, float x, float y);
     static void drawHor(sf::RenderTarget& target, const sf::Texture& texture,
                         int cnt, float x, float y);
     std::pair<int, int> getCellFromMousePos(const sf::Vector2i &mousePos) const;
-
+    void onLeftClick(int row, int col);
 public:
     Game(int rows, int cols, int mines);
 

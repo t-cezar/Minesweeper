@@ -15,11 +15,7 @@ void Game::createWindow() {
     window.create(sf::VideoMode({550, 650}), "Minesweeper Power-Ups", sf::Style::Default);
     window.setFramerateLimit(60);
     gridView.reset(sf::FloatRect(34.f, 119.f, 480.f, 480.f));
-    gridView.setViewport(sf::FloatRect(
-        34.f / 550.f,
-        119.f / 650.f,
-        480.f / 550.f,
-        480.f / 650.f));
+    gridView.setViewport(sf::FloatRect(34.f/550.f,119.f/650.f,480.f/550.f,480.f/650.f));
 }
 
 void Game::initialRender() {
@@ -57,22 +53,9 @@ void Game::initialRender() {
     }
 }
 
-
 void Game::testingGen() const {
-    // std::cout << "Minele din grid (x = mina, o = empty):\n";
-    // for (int i = 0; i < rows; i++) {
-    //     for (int j = 0; j < cols; j++) {
-    //         std::cout << grid.getCell(i, j) << " ";//testez op. << pt. Cell
-    //     }
-    //     std::cout << '\n';
-    // }
-    // std::cout << "\n";
-
-    //testez reveal and flag
-    //grid.revealCell(2, 2);
-    //grid.flagCell(3, 3);
     std::cout << '\n';
-    std::cout << grid; //testez op. << pt. grid
+    std::cout << grid;
 }
 
 void Game::drawSprite(sf::RenderTarget& target, const sf::Texture& texture, float x, float y) {
@@ -83,15 +66,17 @@ void Game::drawSprite(sf::RenderTarget& target, const sf::Texture& texture, floa
 }
 
 void Game::drawSprite(sf::RenderTarget& target, const sf::Texture& texture,
-                float x, float y, const sf::IntRect& rect) {
+                float x, float y, const sf::IntRect& rect, bool red) {
     sf::Sprite sprite;
     sprite.setTexture(texture);
-    if (rect != sf::IntRect()){
+    if (rect != sf::IntRect()) {
         sprite.setTextureRect(rect);
     }
     sprite.setPosition(x, y);
     sprite.setScale(1.875, 1.875);
-    //pt. cell: scale factor de 30/16=1.875, de la 16x16 la 30x30 px
+    if (red) {
+        sprite.setColor(sf::Color(255, 150, 150, 255));
+    }
     target.draw(sprite);
 }
 
@@ -109,21 +94,35 @@ void Game::drawHor(sf::RenderTarget& target, const sf::Texture& texture,
     } //offset pentru x = 4.0f;
 }
 
-std::pair<int, int> Game::getCellFromMousePos(const sf::Vector2i &mousePos) const {
+std::pair<int, int> Game::getCellFromMousePos(const sf::Vector2i &mousePosition) const {
     constexpr int gridXStart = 34;
     constexpr int gridYStart = 119;
     constexpr int cellSize = 30;
 
-    int gridX = mousePos.x - gridXStart;
-    int gridY = mousePos.y - gridYStart;
+    int gridX = mousePosition.x - gridXStart;
+    int gridY = mousePosition.y - gridYStart;
     if (gridX >= 0 && gridX < cols * cellSize &&
         gridY >= 0 && gridY < rows * cellSize) {
         int col = gridX / cellSize;
         int row = gridY / cellSize;
-
         return {row, col};
         }
     return {-1, -1};
+}
+
+void Game::onLeftClick(int row, int col) {
+    if (!grid.getCell(row, col).isFlagged()) {
+        if (grid.getCell(row, col).isRevealed()) {
+            gameOver = grid.revealAroundCell(row, col);
+        } else if (grid.getCell(row, col).isMine()) {
+            grid.makeRedMine(row, col);
+            gameOver = true;
+        } else if (grid.minesCount(row, col) == 0) {
+            grid.revealEmptyCells(row, col);
+        } else {
+            grid.revealCell(row, col);
+        }
+    }
 }
 
 void Game::update() {
@@ -139,31 +138,30 @@ void Game::update() {
                 }
                 break;
             case sf::Event::MouseButtonPressed: {
-                mousePos = sf::Mouse::getPosition(window);
-                cellCoord = getCellFromMousePos(mousePos);
-                int row = cellCoord.first;
-                int col = cellCoord.second;
-                if (row != -1 && col != -1) {
-                    if (event.mouseButton.button == sf::Mouse::Left) {
-                        if (grid.getCell(row, col).isMine()) {
-                            gameOver = true;
-                        } else {
-                            grid.revealCell(row, col);
+                if (!gameOver) {
+                    mousePos = sf::Mouse::getPosition(window);
+                    cellCoord = getCellFromMousePos(mousePos);
+                    int row = cellCoord.first;
+                    int col = cellCoord.second;
+                    if (row != -1 && col != -1) {
+                        if (event.mouseButton.button == sf::Mouse::Left) {
+                            onLeftClick(row, col);
                         }
-                    } else if (event.mouseButton.button == sf::Mouse::Right) {
-                        grid.flagCell(row, col);
+                        if (event.mouseButton.button == sf::Mouse::Right) {
+                            if (!grid.getCell(row, col).isRevealed()) {
+                                grid.flagCell(row, col);
+                            }
+                        }
                     }
                 }
-                testingGen();
                 break;
             }
             default:
                 break;
         }
     }
-    if (shouldExit || gameOver) {
-        window.close();
-    }
+    if (shouldExit) window.close();
+    if (gameOver) grid.revealAllMines();
 }
 
 void Game::render() {
@@ -172,37 +170,47 @@ void Game::render() {
     window.setView(gridView);
     for (int i = 0; i < rows; i++) {
         for (int j = 0; j < cols; j++) {
+            bool red = false;
             const auto &cell = grid.getCell(i, j);
             sf::IntRect cellTexture;
+
             if (cell.isRevealed()) {
                 if (cell.isMine()) {
-                    cellTexture = cells[11]; //Mines
-                } else {
-                    int nrMines = grid.getNrMinesAroundCell(i, j);
-                    if (nrMines > 0) {
-                        cellTexture = cells[nrMines - 1];
+                    if (grid.getCell(i, j).isRedMine()) {
+                        cellTexture = cells[12]; //red mine
                     } else {
-                        cellTexture = cells[9]; //Revealed cell
+                        cellTexture = cells[11]; //mine
+                    }
+                } else {
+                    int minesAroundCell = grid.minesCount(i, j);
+                    if (minesAroundCell != 0) {
+                        cellTexture = cells[minesAroundCell - 1];
+                    } else {
+                        cellTexture = cells[9]; //empty cell
                     }
                 }
             } else if (cell.isFlagged()) {
-                cellTexture = cells[10]; //Flagged cell
+                if (gameOver && !cell.isMine()) {
+                    red = true; //red flag
+                }
+                cellTexture = cells[10]; //flagged cell
             } else {
-                cellTexture = cells[8]; //Unrevealed cell
+                cellTexture = cells[8]; //unrevealed cell
             }
-
             drawSprite(window, (*textureMap)["textures"],
                        34.f + static_cast<float>(j) * 30.f,
-                       119.f + static_cast<float>(i) * 30.f, cellTexture);
+                       119.f + static_cast<float>(i) * 30.f, cellTexture, red);
         }
     }
     window.setView(window.getDefaultView());
     window.display();
 }
 
+
 void Game::run() {
     createWindow();
     initialRender();
+    testingGen();
     while (window.isOpen()) {
         update();
         render();

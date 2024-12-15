@@ -3,17 +3,23 @@
 Cell::Cell()
     : mine(false),
       revealed(false),
-      flagged(false) {}
+      flagged(false),
+      redMine(false) {}
 
 Cell::Cell(const Cell &other)
     : mine(other.mine),
       revealed(other.revealed),
-      flagged(other.flagged) {}
+      flagged(other.flagged),
+      redMine(other.redMine) {}
 
 Cell::~Cell() = default;
 
 void Cell::setMine() {
     mine = true;
+}
+
+void Cell::setRedMine() {
+    redMine = true;
 }
 
 void Cell::revealCellToggle() {
@@ -26,6 +32,10 @@ void Cell::flagCellToggle() {
 
 bool Cell::isMine() const {
     return mine;
+}
+
+bool Cell::isRedMine() const {
+    return redMine;
 }
 
 bool Cell::isRevealed() const {
