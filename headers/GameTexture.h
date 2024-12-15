@@ -11,12 +11,9 @@ class GameTexture {
 
 public:
     explicit GameTexture(std::shared_ptr<std::map<std::string, sf::Texture>> textureMap);
-
-    //adaug texturi care nu provin din sprite sheet
     void addTexture(const std::string &name, const std::string &path) const;
-
-    //"Populeaza" array-ul cells[12] dintr-un sprite sheet cu texturile specifice
     static void addCellsTextures(sf::IntRect (&cells)[12]);
+    void initAddTextures(sf::IntRect (&cells)[12]) const;
 };
 
-#endif // GAMETEXTURE_H
+#endif

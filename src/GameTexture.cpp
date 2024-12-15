@@ -9,7 +9,7 @@ void GameTexture::addTexture(const std::string &name, const std::string &path) c
     if (texture.loadFromFile(path)) {
         (*textureMap)[name] = texture;
     } else {
-        throw std::runtime_error("Error1");
+        throw std::runtime_error("Error addTexture()");
     }
 }
 
@@ -25,4 +25,16 @@ void GameTexture::addCellsTextures(sf::IntRect (&cells)[12]) {
     cells[9] = sf::IntRect(18, 56, 16, 16);  // celula Revealed
     cells[10] = sf::IntRect(35, 56, 16, 16); // celula Flagged
     cells[11] = sf::IntRect(52, 56, 16, 16); // Mina
+}
+void GameTexture::initAddTextures(sf::IntRect (&cells)[12]) const{
+    addTexture("corner_up_left", "assets/corner_up_left.png");
+    addTexture("corner_up_right", "assets/corner_up_right.png");
+    addTexture("corner_bottom_left", "assets/corner_bottom_left.png");
+    addTexture("corner_bottom_right", "assets/corner_bottom_right.png");
+    addTexture("t_left", "assets/t_left.png");
+    addTexture("t_right", "assets/t_right.png");
+    addTexture("textures", "assets/textures.png");
+    addTexture("border_hor","assets/border_hor.png");
+    addTexture("border_vert","assets/border_vert.png");
+    addCellsTextures(cells);
 }
