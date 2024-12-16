@@ -9,7 +9,6 @@
 class Game {
     int rows;
     int cols;
-    int nrMines;
     Grid grid;
 
     std::shared_ptr<std::map<std::string, sf::Texture>> textureMap = std::make_shared<std::map<std::string, sf::Texture>>();
@@ -40,7 +39,7 @@ class Game {
     std::pair<int, int> getCellFromMousePos(const sf::Vector2i &mousePos) const;
     void onLeftClick(int row, int col);
 public:
-    Game(int rows, int cols, int mines);
+    Game(int rows, int cols);
 
     void update();
     void render();

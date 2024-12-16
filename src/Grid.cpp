@@ -99,8 +99,8 @@ void Grid::revealEmptyCells(int row, int col) {//consider empty acea celula care
 }
 
 int Grid::revealAroundCell(int row, int col) {
-    int flaggedCells = aroundCell(row, col, &Cell::isFlagged);
-    int mineCells = aroundCell(row, col, &Cell::isMine);
+    int flaggedCells = flagsCount(row, col);
+    int mineCells = minesCount(row, col);
 
     if (flaggedCells == mineCells) {
         int correctFlags = 0;

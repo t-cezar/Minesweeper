@@ -1,11 +1,10 @@
 #include "../headers/Game.h"
 #include <thread>
 #include <iostream>
-Game::Game(int rows, int cols, int mines)
+Game::Game(int rows, int cols)
     : rows(rows),
       cols(cols),
-      nrMines(mines),
-      grid(rows, cols, mines),
+      grid(rows, cols, 40),
       textureMap(std::make_shared<std::map<std::string, sf::Texture>>()),
       gameTexture(textureMap),
       shouldExit(false),
