@@ -53,8 +53,7 @@ void Game::initialRender() {
 }
 
 void Game::testingGen() const {
-    std::cout << '\n';
-    std::cout << grid;
+    std::cout << *this;
 }
 
 void Game::drawSprite(sf::RenderTarget& target, const sf::Texture& texture, float x, float y) {
@@ -218,3 +217,7 @@ void Game::run() {
     }
 }
 
+std::ostream& operator<<(std::ostream& stream, const Game& game) {
+    stream << "\nGrid:\n" << game.grid;
+    return stream;
+}

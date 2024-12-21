@@ -44,6 +44,7 @@ public:
     void update();
     void render();
     void run();
+    friend std::ostream& operator<<(std::ostream& stream, const Game& game);
 };
 
 #endif
