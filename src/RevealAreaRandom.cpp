@@ -1,7 +1,10 @@
 #include "../headers/RevealAreaRandom.h"
 #include <ostream>
 
-RevealAreaRandom::RevealAreaRandom(int row, int col) : Powerup(row, col) {}
+RevealAreaRandom::RevealAreaRandom(int row, int col) : Powerup(row, col) {
+    this->row = row;
+    this->col = col;
+}
 
 RevealAreaRandom::RevealAreaRandom(const RevealAreaRandom& other) : Powerup(other) {}
 
@@ -20,7 +23,7 @@ void RevealAreaRandom::activate(std::vector<std::vector<Cell>>& gridCells) const
 }
 
 void RevealAreaRandom::print(std::ostream& os) const {
-    os << "RevealAreaRandom Powerup la (row: " << row << ", col: " << col << ")";
+    os << "RevealAreaRandom Powerup la (row: " << this->row << ", col: " << this->col << ")";
 }
 
 std::shared_ptr<Powerup> RevealAreaRandom::clone() const {

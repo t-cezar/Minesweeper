@@ -1,13 +1,17 @@
 #include "../headers/RevealWrongFlags.h"
 #include <ostream>
 
-RevealWrongFlags::RevealWrongFlags(int row, int col) : Powerup(row, col) {}
+RevealWrongFlags::RevealWrongFlags(int row, int col) : Powerup(row, col) {
+    this->row = row;
+    this->col = col;
+}
+
 
 RevealWrongFlags::RevealWrongFlags(const RevealWrongFlags& other) : Powerup(other) {}
 
 void RevealWrongFlags::activate(std::vector<std::vector<Cell>>& gridCells) const {
-    for (auto& row : gridCells) {
-        for (auto& cell : row) {
+    for (auto& gridRow : gridCells) {
+        for (auto& cell : gridRow) {
             if (cell.isFlagged() && !cell.isMine()) {
                 cell.setMarked();
             }
@@ -16,7 +20,7 @@ void RevealWrongFlags::activate(std::vector<std::vector<Cell>>& gridCells) const
 }
 
 void RevealWrongFlags::print(std::ostream& os) const {
-    os << "RevealWrongFlags Powerup la (row: " << row << ", col: " << col << ")";
+    os << "RevealWrongFlags Powerup la (row: " << this->row << ", col: " << this->col << ")";
 }
 
 std::shared_ptr<Powerup> RevealWrongFlags::clone() const {

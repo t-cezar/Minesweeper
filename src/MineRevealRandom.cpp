@@ -1,7 +1,10 @@
 #include "../headers/MineRevealRandom.h"
 #include <ostream>
 
-MineRevealRandom::MineRevealRandom(int row, int col) : Powerup(row, col) {}
+MineRevealRandom::MineRevealRandom(int row, int col) : Powerup(row, col) {
+    this->row = row;
+    this->col = col;
+}
 
 MineRevealRandom::MineRevealRandom(const MineRevealRandom& other) : Powerup(other) {}
 
@@ -23,7 +26,7 @@ void MineRevealRandom::activate(std::vector<std::vector<Cell>>& gridCells) const
 }
 
 void MineRevealRandom::print(std::ostream& os) const {
-    os << "MineRevealRandom Powerup la (row: " << row << ", col: " << col << ")";
+    os << "MineRevealRandom Powerup la (row: " << this->row << ", col: " << this->col << ")";
 }
 
 std::shared_ptr<Powerup> MineRevealRandom::clone() const {
