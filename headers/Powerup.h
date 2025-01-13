@@ -1,6 +1,5 @@
 #ifndef POWERUP_H
 #define POWERUP_H
-
 #include <vector>
 #include <memory>
 #include "Cell.h"
