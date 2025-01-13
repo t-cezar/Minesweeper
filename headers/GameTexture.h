@@ -12,8 +12,8 @@ class GameTexture {
 public:
     explicit GameTexture(std::shared_ptr<std::map<std::string, sf::Texture>> textureMap);
     void addTexture(const std::string &name, const std::string &path) const;
-    static void addCellsTextures(sf::IntRect (&cells)[13]);
-    void initAddTextures(sf::IntRect (&cells)[13]) const;
+    static void addCellsTextures(sf::IntRect (&cells)[14]);
+    void initAddTextures(sf::IntRect (&cells)[14]) const;
 };
 
 #endif

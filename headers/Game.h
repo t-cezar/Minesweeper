@@ -18,7 +18,7 @@ class Game {
     sf::View gridView;
     sf::RenderTexture staticLayer;
     sf::Sprite staticLayerSprite;
-    sf::IntRect cells[13];
+    sf::IntRect cells[14];
     bool shouldExit;
     bool gameOver;
 

@@ -62,6 +62,14 @@ add_executable(${PROJECT_NAME}
         src/Game.cpp
         headers/GameTexture.h
         src/GameTexture.cpp
+        headers/Powerup.h
+        headers/MineRevealRandom.h
+        src/MineRevealRandom.cpp
+        headers/RevealAreaRandom.h
+        headers/RevealWrongFlags.h
+        src/RevealWrongFlags.cpp
+        src/RevealAreaRandom.cpp
+        src/Powerup.cpp
 )
 
 include(cmake/CompilerFlags.cmake)

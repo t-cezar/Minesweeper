@@ -21,7 +21,7 @@ void Game::initialRender() {
     if (!staticLayer.create(window.getSize().x, window.getSize().y)) {
         throw std::runtime_error("Error staticLayer.create");
     }
-    staticLayer.clear(sf::Color(80, 80, 80));
+    staticLayer.clear(sf::Color(192, 192, 192));
     gameTexture.initAddTextures(cells);
 
     float startX = 10.0f;
@@ -110,18 +110,27 @@ std::pair<int, int> Game::getCellFromMousePos(const sf::Vector2i &mousePosition)
 
 void Game::onLeftClick(int row, int col) {
     if (!grid.getCell(row, col).isFlagged()) {
-        if (grid.getCell(row, col).isRevealed()) {
-            gameOver = grid.revealAroundCell(row, col);
-        } else if (grid.getCell(row, col).isMine()) {
-            grid.makeRedMine(row, col);
-            gameOver = true;
-        } else if (grid.minesCount(row, col) == 0) {
-            grid.revealEmptyCells(row, col);
-        } else {
+        if (grid.hasPowerup(row, col)) {
+            grid.activatePowerup(row, col);
             grid.revealCell(row, col);
+            grid.markedEmptyReveal();
+        } else {
+            // Logică normală a jocului
+            if (grid.getCell(row, col).isRevealed()) {
+                gameOver = grid.revealAroundCell(row, col);
+            } else if (grid.getCell(row, col).isMine()) {
+                grid.makeRedMine(row, col);
+                gameOver = true;
+            } else if (grid.minesCount(row, col) == 0) {
+                grid.revealEmptyCells(row, col);
+            } else {
+                grid.revealCell(row, col);
+            }
         }
     }
 }
+
+
 
 void Game::update() {
     sf::Event event{};
@@ -162,10 +171,13 @@ void Game::update() {
     if (gameOver) grid.revealAllMines();
 }
 
+
+
 void Game::render() {
-    window.clear(sf::Color(80, 80, 80));
+    window.clear(sf::Color(192, 192, 192));
     window.draw(staticLayerSprite);
     window.setView(gridView);
+
     for (int i = 0; i < rows; i++) {
         for (int j = 0; j < cols; j++) {
             bool red = false;
@@ -173,36 +185,43 @@ void Game::render() {
             sf::IntRect cellTexture;
 
             if (cell.isRevealed()) {
-                if (cell.isMine()) {
-                    if (grid.getCell(i, j).isRedMine()) {
-                        cellTexture = cells[12]; //red mine
+                if (grid.hasPowerup(i, j)) {
+                    // Show the flag texture as a placeholder for power-ups.
+                    cellTexture = cells[13];
+                    //red = true;
+                } else if (cell.isMine()) {
+                    if (cell.isRedMine()) {
+                        cellTexture = cells[12]; // Red mine
                     } else {
-                        cellTexture = cells[11]; //mine
+                        cellTexture = cells[11]; // Mine
                     }
                 } else {
                     int minesAroundCell = grid.minesCount(i, j);
                     if (minesAroundCell != 0) {
                         cellTexture = cells[minesAroundCell - 1];
                     } else {
-                        cellTexture = cells[9]; //empty cell
+                        cellTexture = cells[9]; // Empty cell
                     }
                 }
             } else if (cell.isFlagged()) {
-                if (gameOver && !cell.isMine()) {
-                    red = true; //red flag
+                if ( (!cell.isMine() && gameOver) || (!cell.isMine() && cell.isMarked()) ) {
+                    red = true; // Red flag
                 }
-                cellTexture = cells[10]; //flagged cell
+                cellTexture = cells[10]; // Flagged
             } else {
-                cellTexture = cells[8]; //unrevealed cell
+                cellTexture = cells[8]; // Unrevealed
             }
+
             drawSprite(window, (*textureMap)["textures"],
                        34.f + static_cast<float>(j) * 30.f,
                        119.f + static_cast<float>(i) * 30.f, cellTexture, red);
         }
     }
+
     window.setView(window.getDefaultView());
     window.display();
 }
+
 
 
 void Game::run() {

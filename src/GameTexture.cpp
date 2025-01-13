@@ -13,7 +13,7 @@ void GameTexture::addTexture(const std::string &name, const std::string &path) c
     }
 }
 
-void GameTexture::addCellsTextures(sf::IntRect (&cells)[13]) {
+void GameTexture::addCellsTextures(sf::IntRect (&cells)[14]) {
     cells[0] = sf::IntRect(1, 73, 16, 16);
     for (int i = 1; i <= 7; i++) {
         cells[i] = cells[i - 1];
@@ -26,8 +26,9 @@ void GameTexture::addCellsTextures(sf::IntRect (&cells)[13]) {
     cells[10] = sf::IntRect(35, 56, 16, 16); // celula Flagged
     cells[11] = sf::IntRect(86, 56, 16, 16); // Mina
     cells[12] = sf::IntRect(103, 56, 16, 16); // Mina rosie (apasata)
+    cells[13] = sf::IntRect(52, 56, 16, 16); //powerup (simbol: ?)
 }
-void GameTexture::initAddTextures(sf::IntRect (&cells)[13]) const{
+void GameTexture::initAddTextures(sf::IntRect (&cells)[14]) const{
     addTexture("corner_up_left", "assets/corner_up_left.png");
     addTexture("corner_up_right", "assets/corner_up_right.png");
     addTexture("corner_bottom_left", "assets/corner_bottom_left.png");

@@ -1,12 +1,23 @@
 #include "../headers/Grid.h"
+#include "../headers/MineRevealRandom.h"
+#include "../headers/RevealAreaRandom.h"
+#include "../headers/RevealWrongFlags.h"
 #include <queue>
 #include <set>
+#include <ranges>
+#include <algorithm>
+
+#include <iostream>
 
 Grid::Grid(int rows, int cols, int mines)
     : rows(rows),
       cols(cols),
       nrMines(mines),
-      grid(rows, std::vector<Cell>(cols)) { generateMines(); }
+      grid(rows, std::vector<Cell>(cols)),
+      firstPowerupCloned(false) {
+    generateMines();
+    generatePowerups();
+}
 
 void Grid::generateMines() {
     int mineCount = 0;
@@ -121,10 +132,12 @@ int Grid::revealAroundCell(int row, int col) {
                 }
             }
         }
-        if (correctFlags != mineCells) {
+        if (correctFlags != mineCells) {std::cout<< "\n"<<correctFlags<< " "<< mineCells;
             return true;
+
         }
     }
+
     return false;
 }
 
@@ -138,6 +151,17 @@ void Grid::revealAllMines() {
     }
 }
 
+void Grid::markedEmptyReveal() {
+    for (int row = 0; row < rows; row++) {
+        for (int col = 0; col < cols; col++) {
+            if (!grid[row][col].isMine() && grid[row][col].isMarked()
+                && minesCount(row, col) == 0 && grid[row][col].isRevealed()) {
+                revealEmptyCells(row, col);
+                }
+        }
+    }
+}
+
 int Grid::randomNr(int low, int high) {
     static std::random_device rd;
     static std::default_random_engine gen(rd());
@@ -146,11 +170,75 @@ int Grid::randomNr(int low, int high) {
     return uid(gen, Dist::param_type{low, high});
 }
 
-std::ostream& operator<<(std::ostream& os, const Grid& grid) {
-    for (int row = 0; row < grid.rows; row++) {
-        for (int col = 0; col < grid.cols; col++) {
-            os << grid.grid[row][col] << " ";
+void Grid::generatePowerups() {
+    powerups.clear();
+    for (int i = 0; i < 3; ++i) {
+        int row, col;
+
+        do {
+            row = randomNr(0, rows - 1);
+            col = randomNr(0, cols - 1);
+        } while (grid[row][col].isRevealed() || grid[row][col].isMine() || hasPowerup(row, col));
+
+        int type = randomNr(0, 2);
+        std::shared_ptr<Powerup> powerup;
+        if (type == 0) {
+            powerup = std::make_shared<MineRevealRandom>(row, col);
+        } else if (type == 1) {
+            powerup = std::make_shared<RevealAreaRandom>(row, col);
+        } else {
+            powerup = std::make_shared<RevealWrongFlags>(row, col);
         }
+        powerups.push_back(std::move(powerup));
+    }
+
+    if (dynamic_cast<RevealAreaRandom*>(powerups[1].get()) &&
+        dynamic_cast<MineRevealRandom*>(powerups[2].get())) {
+        std::swap(powerups[1], powerups[2]);
+        }
+}
+
+bool Grid::hasPowerup(int row, int col) const {
+    return std::ranges::any_of(powerups, [row, col](const auto& powerup) {
+        return powerup->getRow() == row && powerup->getCol() == col;
+    });
+}
+
+void Grid::activatePowerup(int row, int col) {
+    for (auto it = powerups.begin(); it != powerups.end(); ++it) {
+        if ((*it)->getRow() == row && (*it)->getCol() == col) {
+            (*it)->activate(grid);
+            if (!firstPowerupCloned) {
+                auto clonedPowerup = (*it)->clone();
+
+                int newRow, newCol;
+                do {
+                    newRow = randomNr(0, rows - 1);
+                    newCol = randomNr(0, cols - 1);
+                } while (grid[newRow][newCol].isRevealed() || grid[newRow][newCol].isMine() || hasPowerup(newRow, newCol));
+
+                clonedPowerup->setCoordinates(newRow, newCol);
+                powerups.push_back(clonedPowerup);
+                firstPowerupCloned = true;
+            }
+            powerups.erase(it);
+            return;
+        }
+    }
+}
+
+
+std::ostream& operator<<(std::ostream& os, const Grid& grid) {
+    for (const auto& row : grid.grid) {
+        for (const auto& cell : row) {
+            os << cell << " ";
+        }
+        os << "\n";
+    }
+
+    os << "\nPower-ups:\n";
+    for (const auto& powerup : grid.powerups) {
+        powerup->print(os);
         os << "\n";
     }
     return os;
