@@ -3,6 +3,8 @@
 
 RevealWrongFlags::RevealWrongFlags(int row, int col) : Powerup(row, col) {}
 
+RevealWrongFlags::RevealWrongFlags(const RevealWrongFlags& other) : Powerup(other) {}
+
 void RevealWrongFlags::activate(std::vector<std::vector<Cell>>& gridCells) const {
     for (auto& row : gridCells) {
         for (auto& cell : row) {

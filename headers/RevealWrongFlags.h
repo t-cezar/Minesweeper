@@ -7,6 +7,7 @@
 class RevealWrongFlags : public Powerup {
 public:
     RevealWrongFlags(int row, int col);
+    RevealWrongFlags(const RevealWrongFlags& other);
 
     void activate(std::vector<std::vector<Cell>>& gridCells) const override;
     void print(std::ostream& os) const override;

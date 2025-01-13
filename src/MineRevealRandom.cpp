@@ -3,6 +3,8 @@
 
 MineRevealRandom::MineRevealRandom(int row, int col) : Powerup(row, col) {}
 
+MineRevealRandom::MineRevealRandom(const MineRevealRandom& other) : Powerup(other) {}
+
 void MineRevealRandom::activate(std::vector<std::vector<Cell>>& gridCells) const {
     int checkedCells = 0;
     int sizeGrid = static_cast<int>(gridCells.size() * gridCells[0].size());

@@ -166,7 +166,7 @@ int Grid::randomNr(int low, int high) {
     static std::random_device rd;
     static std::default_random_engine gen(rd());
     using Dist = std::uniform_int_distribution<int>;
-    static Dist uid {};
+    static Dist uid{};
     return uid(gen, Dist::param_type{low, high});
 }
 
@@ -176,8 +176,8 @@ void Grid::generatePowerups() {
         int row, col;
 
         do {
-            row = randomNr(0, rows - 1);
-            col = randomNr(0, cols - 1);
+            row = randomNr(0, this->rows - 1);
+            col = randomNr(0, this->cols - 1);
         } while (grid[row][col].isRevealed() || grid[row][col].isMine() || hasPowerup(row, col));
 
         int type = randomNr(0, 2);
@@ -192,41 +192,45 @@ void Grid::generatePowerups() {
         powerups.push_back(std::move(powerup));
     }
 
-    if (dynamic_cast<RevealAreaRandom*>(powerups[1].get()) &&
-        dynamic_cast<MineRevealRandom*>(powerups[2].get())) {
+    if (dynamic_cast<RevealAreaRandom *>(powerups[1].get()) &&
+        dynamic_cast<MineRevealRandom *>(powerups[2].get())) {
         std::swap(powerups[1], powerups[2]);
-        }
+    }
 }
 
 bool Grid::hasPowerup(int row, int col) const {
-    return std::ranges::any_of(powerups, [row, col](const auto& powerup) {
+    return std::ranges::any_of(powerups, [row, col](const auto &powerup) {
         return powerup->getRow() == row && powerup->getCol() == col;
     });
 }
 
 void Grid::activatePowerup(int row, int col) {
-    for (auto it = powerups.begin(); it != powerups.end(); ++it) {
-        if ((*it)->getRow() == row && (*it)->getCol() == col) {
-            (*it)->activate(grid);
+    int indexToRemove = -1;
+    for (size_t i = 0; i < powerups.size(); ++i) {
+        if (powerups[i]->getRow() == row && powerups[i]->getCol() == col) {
+            powerups[i]->activate(grid);
             if (!firstPowerupCloned) {
-                auto clonedPowerup = (*it)->clone();
+                auto clonedPowerup = powerups[i]->clone();
 
                 int newRow, newCol;
                 do {
                     newRow = randomNr(0, rows - 1);
                     newCol = randomNr(0, cols - 1);
-                } while (grid[newRow][newCol].isRevealed() || grid[newRow][newCol].isMine() || hasPowerup(newRow, newCol));
+                } while (grid[newRow][newCol].isRevealed() || grid[newRow][newCol].isMine() || hasPowerup(
+                             newRow, newCol));
 
                 clonedPowerup->setCoordinates(newRow, newCol);
-                powerups.push_back(clonedPowerup);
+                powerups.push_back(std::move(clonedPowerup));
                 firstPowerupCloned = true;
             }
-            powerups.erase(it);
-            return;
+            indexToRemove = static_cast<int>(i);
+            break;
         }
     }
+    if (indexToRemove != -1) {
+        powerups.erase(powerups.begin() + indexToRemove);
+    }
 }
-
 
 std::ostream& operator<<(std::ostream& os, const Grid& grid) {
     for (const auto& row : grid.grid) {

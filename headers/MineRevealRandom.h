@@ -7,6 +7,7 @@
 class MineRevealRandom : public Powerup {
 public:
     MineRevealRandom(int row, int col);
+    MineRevealRandom(const MineRevealRandom& other);
 
     void activate(std::vector<std::vector<Cell>>& gridCells) const override;
     void print(std::ostream& os) const override;

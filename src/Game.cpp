@@ -115,7 +115,6 @@ void Game::onLeftClick(int row, int col) {
             grid.revealCell(row, col);
             grid.markedEmptyReveal();
         } else {
-            // Logică normală a jocului
             if (grid.getCell(row, col).isRevealed()) {
                 gameOver = grid.revealAroundCell(row, col);
             } else if (grid.getCell(row, col).isMine()) {
@@ -186,9 +185,7 @@ void Game::render() {
 
             if (cell.isRevealed()) {
                 if (grid.hasPowerup(i, j)) {
-                    // Show the flag texture as a placeholder for power-ups.
-                    cellTexture = cells[13];
-                    //red = true;
+                    cellTexture = cells[13]; // cell cu simbol (?)
                 } else if (cell.isMine()) {
                     if (cell.isRedMine()) {
                         cellTexture = cells[12]; // Red mine

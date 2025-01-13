@@ -3,6 +3,8 @@
 
 RevealAreaRandom::RevealAreaRandom(int row, int col) : Powerup(row, col) {}
 
+RevealAreaRandom::RevealAreaRandom(const RevealAreaRandom& other) : Powerup(other) {}
+
 void RevealAreaRandom::activate(std::vector<std::vector<Cell>>& gridCells) const {
     while (true) {
         int randomRow = generateRandom(0, static_cast<int>(gridCells.size()) - 1);

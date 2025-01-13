@@ -7,6 +7,7 @@
 class RevealAreaRandom : public Powerup {
 public:
     RevealAreaRandom(int row, int col);
+    RevealAreaRandom(const RevealAreaRandom& other);
 
     void activate(std::vector<std::vector<Cell>>& gridCells) const override;
     void print(std::ostream& os) const override;
