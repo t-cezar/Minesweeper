@@ -14,8 +14,8 @@ void ThreeMineRevealRandom::activate(std::vector<std::vector<Cell>>& gridCells) 
 
     // numar cate bombe pot fi flagged
     int minesAvailable = 0;
-    for (const auto& row : gridCells) {
-        for (const auto& cell : row) {
+    for (const auto& gridRow : gridCells) {
+        for (const auto& cell : gridRow) {
             if (!cell.isRevealed() && cell.isMine() && !cell.isFlagged()) {
                 minesAvailable++;
             }
