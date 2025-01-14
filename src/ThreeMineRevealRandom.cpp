@@ -1,7 +1,10 @@
 #include "../headers/ThreeMineRevealRandom.h"
 #include <ostream>
 
-ThreeMineRevealRandom::ThreeMineRevealRandom(int row, int col) : Powerup(row, col) {}
+ThreeMineRevealRandom::ThreeMineRevealRandom(int row, int col) : Powerup(row, col) {
+    this->row = row;
+    this->col = col;
+}
 
 ThreeMineRevealRandom::ThreeMineRevealRandom(const ThreeMineRevealRandom& other) : Powerup(other) {}
 
