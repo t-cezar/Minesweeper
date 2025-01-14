@@ -72,6 +72,8 @@ add_executable(${PROJECT_NAME}
         src/Powerup.cpp
         headers/PowerupFactory.h
         src/PowerupFactory.cpp
+        headers/ThreeMineRevealRandom.h
+        src/ThreeMineRevealRandom.cpp
 )
 
 include(cmake/CompilerFlags.cmake)

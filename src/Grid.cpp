@@ -180,7 +180,7 @@ void Grid::generatePowerups() {
             col = randomNr(0, this->cols - 1);
         } while (grid[row][col].isRevealed() || grid[row][col].isMine() || hasPowerup(row, col));
 
-        int type = randomNr(0, 2);
+        int type = randomNr(0, 3);
         if (auto powerup = PowerupFactory::createPowerup(type, row, col)) {
             powerups.push_back(std::move(powerup));
         }
