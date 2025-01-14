@@ -1,12 +1,12 @@
 #include "../headers/Grid.h"
 #include "../headers/MineRevealRandom.h"
 #include "../headers/RevealAreaRandom.h"
-#include "../headers/RevealWrongFlags.h"
+#include "../headers/PowerupFactory.h"
+
 #include <queue>
 #include <set>
 #include <ranges>
 #include <algorithm>
-
 #include <iostream>
 
 Grid::Grid(int rows, int cols, int mines)
@@ -172,31 +172,26 @@ int Grid::randomNr(int low, int high) {
 
 void Grid::generatePowerups() {
     powerups.clear();
-    for (int i = 0; i < 3; ++i) {
-        int row, col;
 
+    for (int i = 0; i < 3; i++) {
+        int row, col;
         do {
             row = randomNr(0, this->rows - 1);
             col = randomNr(0, this->cols - 1);
         } while (grid[row][col].isRevealed() || grid[row][col].isMine() || hasPowerup(row, col));
 
         int type = randomNr(0, 2);
-        std::shared_ptr<Powerup> powerup;
-        if (type == 0) {
-            powerup = std::make_shared<MineRevealRandom>(row, col);
-        } else if (type == 1) {
-            powerup = std::make_shared<RevealAreaRandom>(row, col);
-        } else {
-            powerup = std::make_shared<RevealWrongFlags>(row, col);
+        if (auto powerup = PowerupFactory::createPowerup(type, row, col)) {
+            powerups.push_back(std::move(powerup));
         }
-        powerups.push_back(std::move(powerup));
     }
 
     if (dynamic_cast<RevealAreaRandom *>(powerups[1].get()) &&
         dynamic_cast<MineRevealRandom *>(powerups[2].get())) {
         std::swap(powerups[1], powerups[2]);
-    }
+        }
 }
+
 
 bool Grid::hasPowerup(int row, int col) const {
     return std::ranges::any_of(powerups, [row, col](const auto &powerup) {
@@ -206,7 +201,7 @@ bool Grid::hasPowerup(int row, int col) const {
 
 void Grid::activatePowerup(int row, int col) {
     int indexToRemove = -1;
-    for (size_t i = 0; i < powerups.size(); ++i) {
+    for (size_t i = 0; i < powerups.size(); i++) {
         if (powerups[i]->getRow() == row && powerups[i]->getCol() == col) {
             powerups[i]->activate(grid);
             if (!firstPowerupCloned) {

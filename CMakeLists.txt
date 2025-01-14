@@ -70,6 +70,8 @@ add_executable(${PROJECT_NAME}
         src/RevealWrongFlags.cpp
         src/RevealAreaRandom.cpp
         src/Powerup.cpp
+        headers/PowerupFactory.h
+        src/PowerupFactory.cpp
 )
 
 include(cmake/CompilerFlags.cmake)
