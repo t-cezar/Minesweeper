@@ -1,6 +1,8 @@
 #include "../headers/Game.h"
+#include "../headers/GameException.h"
 #include <thread>
 #include <iostream>
+
 Game::Game(int rows, int cols)
     : rows(rows),
       cols(cols),
@@ -10,8 +12,12 @@ Game::Game(int rows, int cols)
       shouldExit(false),
       gameOver(false){}
 
+
 void Game::createWindow() {
     window.create(sf::VideoMode({550, 650}), "Minesweeper Power-Ups", sf::Style::Default);
+    if (!window.isOpen()) {
+        throw InitCreateException("Esuare la crearea Window");
+    }
     window.setFramerateLimit(60);
     gridView.reset(sf::FloatRect(34.f, 119.f, 480.f, 480.f));
     gridView.setViewport(sf::FloatRect(34.f/550.f,119.f/650.f,480.f/550.f,480.f/650.f));
@@ -19,7 +25,7 @@ void Game::createWindow() {
 
 void Game::initialRender() {
     if (!staticLayer.create(window.getSize().x, window.getSize().y)) {
-        throw std::runtime_error("Error staticLayer.create");
+        throw InitCreateException("Esuare la crearea staticLayer.");
     }
     staticLayer.clear(sf::Color(192, 192, 192));
     gameTexture.initAddTextures(cells);
@@ -48,7 +54,7 @@ void Game::initialRender() {
     //rendez doar una (care teoretic le cuprinde pe toate cele de sus) in render():
     staticLayerSprite.setTexture(staticLayer.getTexture());
     if (!staticLayerSprite.getTexture()) {
-        throw std::runtime_error("Error staticLayerSprite.getTexture");
+        throw InitCreateException("Nu s-a putut seta textura pentru staticLayerSprite.");
     }
 }
 
@@ -188,7 +194,8 @@ void Game::render() {
                     cellTexture = cells[13]; // cell cu simbol (?)
                 } else if (cell.isMine()) {
                     if (cell.isRedMine()) {
-                        cellTexture = cells[12]; // Red mine
+                        cellTexture = cells[12]; // Red mine;
+                        std::cout<<"a ajuns pana la cells 12";
                     } else {
                         cellTexture = cells[11]; // Mine
                     }
@@ -219,17 +226,27 @@ void Game::render() {
     window.display();
 }
 
-
-
 void Game::run() {
-    createWindow();
-    initialRender();
-    testingGen();
-    while (window.isOpen()) {
-        update();
-        render();
-        using namespace std::chrono_literals;
-        std::this_thread::sleep_for(300ms);
+    try {
+        createWindow();
+        initialRender();
+        testingGen();
+        while (window.isOpen()) {
+            update();
+            render();
+            using namespace std::chrono_literals;
+            std::this_thread::sleep_for(300ms);
+        }
+    } catch (const InitCreateException &e) {
+        std::cerr << "Initial Create Error (Window/staticLayer): " << e.what() << std::endl;
+    } catch (const TextureException &e) {
+        std::cerr << "Texture Error: " << e.what() << std::endl;
+    } catch (const InvalidCoordinateException &e) {
+        std::cerr << "Coordinate Error: " << e.what() << std::endl;
+    } catch (const InvalidGridException& e) {
+        std::cerr << "Grid Initialization Error: " << e.what() << std::endl;
+    } catch (...) {
+        std::cerr << "Unknown error." << std::endl;
     }
 }
 

@@ -2,6 +2,7 @@
 #include "../headers/MineRevealRandom.h"
 #include "../headers/RevealAreaRandom.h"
 #include "../headers/PowerupFactory.h"
+#include "../headers/GameException.h"
 
 #include <queue>
 #include <set>
@@ -11,13 +12,21 @@
 
 Grid::Grid(int rows, int cols, int mines)
     : rows(rows),
-      cols(cols),
-      nrMines(mines),
+      cols(cols), nrMines(mines),
       grid(rows, std::vector<Cell>(cols)),
       firstPowerupCloned(false) {
+    if (rows <= 0 || cols <= 0) {
+        throw InvalidGridException("Randuri si coloane -> nr. pozitive: Rand=" +
+                                   std::to_string(rows) + ", coloana=" + std::to_string(cols));
+    }
+    if (mines > rows * cols) {
+        throw InvalidGridException("Nr. de mine depaseste nr. total de celule. Mine: " +
+                                   std::to_string(mines) + ", celule: " + std::to_string(rows * cols));
+    }
     generateMines();
     generatePowerups();
 }
+
 
 void Grid::generateMines() {
     int mineCount = 0;
@@ -33,9 +42,14 @@ void Grid::generateMines() {
     }
 }
 
-const Cell& Grid::getCell(const int& row, const int& col) const{
+const Cell& Grid::getCell(const int& row, const int& col) const {
+    if (row < 0 || row >= rows || col < 0 || col >= cols) {
+        throw InvalidCoordinateException("Rand sau coloana in afara chenarului: ("
+            + std::to_string(row) + ", " + std::to_string(col) + ").");
+    }
     return grid[row][col];
 }
+
 
 void Grid::withinGrid(int row, int col, void (Cell::*fCell)()) {
     if (row >= 0 && row < rows && col >= 0 && col < cols) {
@@ -44,15 +58,29 @@ void Grid::withinGrid(int row, int col, void (Cell::*fCell)()) {
 }
 
 void Grid::flagCell(int row, int col) {
+    if (row < 0 || row >= rows || col < 0 || col >= cols) {
+        throw InvalidCoordinateException("Rand sau coloana in afara chenarului. Am incercat sa pun 'flag' (" +
+                                         std::to_string(row) + ", " + std::to_string(col) + ")");
+    }
     withinGrid(row, col, &Cell::flagCellToggle);
 }
 
+
 void Grid::revealCell(int row, int col) {
+    if (row < 0 || row >= rows || col < 0 || col >= cols) {
+        throw InvalidCoordinateException("Rand sau coloana in afara chenarului. Am incercat sa fac 'reveal' (" +
+                                         std::to_string(row) + ", " + std::to_string(col) + ")");
+    }
     withinGrid(row, col, &Cell::revealCellToggle);
 }
 
+
 void Grid::makeRedMine(int row, int col) {
-    withinGrid(row, col, &Cell::setRedMine);
+    if (row < 0 || row >= rows || col < 0 || col >= cols) {
+        throw InvalidCoordinateException("Rand sau coloana in afara chenarului. Am incercat sa pun 'Red Mine' (" +
+                                         std::to_string(row) + ", " + std::to_string(col) + ")");
+    }
+    withinGrid(row, col, &Cell::revealCellToggle);
 }
 
 int Grid::aroundCell(int row, int col, bool (Cell::*fCell)() const) const {
@@ -69,15 +97,28 @@ int Grid::aroundCell(int row, int col, bool (Cell::*fCell)() const) const {
 }
 
 int Grid::minesCount(int row, int col) const {
+    if (row < 0 || row >= rows || col < 0 || col >= cols) {
+        throw InvalidCoordinateException("Rand sau coloana in afara chenarului. Am incercat sa numar nr. de mine (" +
+                                         std::to_string(row) + ", " + std::to_string(col) + ")");
+    }
     return aroundCell(row, col, &Cell::isMine);
 }
 
 int Grid::flagsCount(int row, int col) const {
+    if (row < 0 || row >= rows || col < 0 || col >= cols) {
+        throw InvalidCoordinateException("Rand sau coloana in afara chenarului. Am incercat sa numar nr. de flag-uri (" +
+                                         std::to_string(row) + ", " + std::to_string(col) + ")");
+    }
     return aroundCell(row, col, &Cell::isFlagged);
 }
 
 void Grid::revealEmptyCells(int row, int col) {//consider empty acea celula care nu are deloc mine in jurul ei
     if (row < 0 || row >= rows || col < 0 || col >= cols || grid[row][col].isMine()) {
+        if (row < 0 || row >= rows || col < 0 || col >= cols) {
+            throw InvalidCoordinateException("Rand sau coloana in afara chenarului."
+                                             "Am incercat sa folosesc functia revealEmptyCells (" +
+                                             std::to_string(row) + ", " + std::to_string(col) + ")");
+        }
         return;
     }
     std::queue<std::pair<int, int> > queue;
@@ -109,36 +150,50 @@ void Grid::revealEmptyCells(int row, int col) {//consider empty acea celula care
     }
 }
 
+
 int Grid::revealAroundCell(int row, int col) {
-    int flaggedCells = flagsCount(row, col);
-    int mineCells = minesCount(row, col);
-
-    if (flaggedCells == mineCells) {
-        int correctFlags = 0;
-        for (int i = 0; i < 8; i++) {
-            int checkedRow = row + dx[i];
-            int checkedCol = col + dy[i];
-
-            if (checkedRow >= 0 && checkedRow < rows && checkedCol >= 0 && checkedCol < cols) {
-                if (grid[checkedRow][checkedCol].isFlagged() && grid[checkedRow][checkedCol].isMine()) {
-                    correctFlags++;
-                } else {
-                    makeRedMine(checkedRow, checkedCol);
-                }
-                if (!grid[checkedRow][checkedCol].isRevealed() && !grid[checkedRow][checkedCol].isFlagged()) {
-                    revealCell(checkedRow, checkedCol);
-                    if (minesCount(checkedRow, checkedCol) == 0)
-                        revealEmptyCells(checkedRow, checkedCol);
-                }
-            }
-        }
-        if (correctFlags != mineCells) {std::cout<< "\n"<<correctFlags<< " "<< mineCells;
-            return true;
-
+    if (row < 0 || row >= rows || col < 0 || col >= cols || grid[row][col].isMine()) {
+        if (row < 0 || row >= rows || col < 0 || col >= cols) {
+            throw InvalidCoordinateException("Rand sau coloana in afara chenarului."
+                                             "Am incercat sa folosesc functia revealAroundCell (" +
+                                             std::to_string(row) + ", " + std::to_string(col) + ")");
         }
     }
 
-    return false;
+    int flaggedCells = flagsCount(row, col);
+    int mineCells = minesCount(row, col);
+
+    if (flaggedCells != mineCells) return false;
+
+    bool gameOver = false;
+    int correctFlags = 0;
+
+    for (int i = 0; i < 8; i++) {
+        int checkedRow = row + dx[i];
+        int checkedCol = col + dy[i];
+
+        if (checkedRow >= 0 && checkedRow < rows && checkedCol >= 0 && checkedCol < cols) {
+            const Cell& cell = grid[checkedRow][checkedCol];
+
+            if (cell.isFlagged()) {
+                if (cell.isMine()) {
+                    correctFlags++;
+                } else {
+                    grid[checkedRow][checkedCol].setRedMine();
+                    gameOver = true;
+                }
+            } else if (!cell.isRevealed()) {
+                grid[checkedRow][checkedCol].revealCellToggle();
+                if (minesCount(checkedRow, checkedCol) == 0) {
+                    revealEmptyCells(checkedRow, checkedCol);
+                }
+            }
+        }
+    }
+    if (correctFlags != mineCells) {
+        gameOver = true;
+    }
+    return gameOver;
 }
 
 void Grid::revealAllMines() {
@@ -180,12 +235,11 @@ void Grid::generatePowerups() {
             col = randomNr(0, this->cols - 1);
         } while (grid[row][col].isRevealed() || grid[row][col].isMine() || hasPowerup(row, col));
 
-        int type = randomNr(0, 3);
+        int type = randomNr(0, static_cast<int>(PowerupFactory::factoryMap.size()) - 1);
         if (auto powerup = PowerupFactory::createPowerup(type, row, col)) {
             powerups.push_back(std::move(powerup));
         }
     }
-
     if (dynamic_cast<RevealAreaRandom *>(powerups[1].get()) &&
         dynamic_cast<MineRevealRandom *>(powerups[2].get())) {
         std::swap(powerups[1], powerups[2]);
@@ -194,12 +248,26 @@ void Grid::generatePowerups() {
 
 
 bool Grid::hasPowerup(int row, int col) const {
+    if (row < 0 || row >= rows || col < 0 || col >= cols || grid[row][col].isMine()) {
+        if (row < 0 || row >= rows || col < 0 || col >= cols) {
+            throw InvalidCoordinateException("Rand sau coloana in afara chenarului."
+                                             "Am incercat sa folosesc functia hasPowerup (" +
+                                             std::to_string(row) + ", " + std::to_string(col) + ")");
+        }
+    }
     return std::ranges::any_of(powerups, [row, col](const auto &powerup) {
         return powerup->getRow() == row && powerup->getCol() == col;
     });
 }
 
 void Grid::activatePowerup(int row, int col) {
+    if (row < 0 || row >= rows || col < 0 || col >= cols || grid[row][col].isMine()) {
+        if (row < 0 || row >= rows || col < 0 || col >= cols) {
+            throw InvalidCoordinateException("Rand sau coloana in afara chenarului."
+                                             "Am incercat sa folosesc functia activatePowerup (" +
+                                             std::to_string(row) + ", " + std::to_string(col) + ")");
+        }
+    }
     int indexToRemove = -1;
     for (size_t i = 0; i < powerups.size(); i++) {
         if (powerups[i]->getRow() == row && powerups[i]->getCol() == col) {

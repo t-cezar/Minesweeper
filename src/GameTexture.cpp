@@ -1,5 +1,5 @@
 #include "../headers/GameTexture.h"
-#include <stdexcept>
+#include "../headers/GameException.h"
 
 GameTexture::GameTexture(std::shared_ptr<std::map<std::string, sf::Texture>> textureMap)
     : textureMap(std::move(textureMap)) {}
@@ -9,7 +9,7 @@ void GameTexture::addTexture(const std::string &name, const std::string &path) c
     if (texture.loadFromFile(path)) {
         (*textureMap)[name] = texture;
     } else {
-        throw std::runtime_error("Error addTexture()");
+        throw TextureException("Esuare incarcare textura din path-ul: " + path);
     }
 }
 
@@ -28,7 +28,8 @@ void GameTexture::addCellsTextures(sf::IntRect (&cells)[14]) {
     cells[12] = sf::IntRect(103, 56, 16, 16); // Mina rosie (apasata)
     cells[13] = sf::IntRect(52, 56, 16, 16); //powerup (simbol: ?)
 }
-void GameTexture::initAddTextures(sf::IntRect (&cells)[14]) const{
+
+void GameTexture::initAddTextures(sf::IntRect (&cells)[14]) const {
     addTexture("corner_up_left", "assets/corner_up_left.png");
     addTexture("corner_up_right", "assets/corner_up_right.png");
     addTexture("corner_bottom_left", "assets/corner_bottom_left.png");
@@ -36,7 +37,7 @@ void GameTexture::initAddTextures(sf::IntRect (&cells)[14]) const{
     addTexture("t_left", "assets/t_left.png");
     addTexture("t_right", "assets/t_right.png");
     addTexture("textures", "assets/textures.png");
-    addTexture("border_hor","assets/border_hor.png");
-    addTexture("border_vert","assets/border_vert.png");
+    addTexture("border_hor", "assets/border_hor.png");
+    addTexture("border_vert", "assets/border_vert.png");
     addCellsTextures(cells);
 }

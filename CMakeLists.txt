@@ -74,6 +74,7 @@ add_executable(${PROJECT_NAME}
         src/PowerupFactory.cpp
         headers/ThreeMineRevealRandom.h
         src/ThreeMineRevealRandom.cpp
+        headers/GameException.h
 )
 
 include(cmake/CompilerFlags.cmake)
