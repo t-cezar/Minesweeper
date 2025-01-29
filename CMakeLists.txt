@@ -75,6 +75,7 @@ add_executable(${PROJECT_NAME}
         headers/ThreeMineRevealRandom.h
         src/ThreeMineRevealRandom.cpp
         headers/GameException.h
+        headers/ResourceManager.h
 )
 
 include(cmake/CompilerFlags.cmake)
